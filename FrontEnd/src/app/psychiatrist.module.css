@@ -1,0 +1,130 @@
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.searchSection {
+    margin-bottom: 2rem;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+.patientList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.patientCard {
+    padding: 1rem;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.patientCard:hover {
+    border-color: #4CAF50;
+    transform: translateY(-2px);
+}
+
+.patientCard.selected {
+    border-color: #4CAF50;
+    background-color: #f0f9f0;
+}
+
+.patientDetails {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.patientName {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.section {
+    margin-bottom: 2rem;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    color: #444;
+    margin-bottom: 1rem;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.historyItem {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    gap: 1rem;
+}
+
+.date {
+    min-width: 100px;
+    color: #666;
+}
+
+.mood {
+    font-size: 1.5rem;
+}
+
+.trigger {
+    flex: 1;
+}
+
+.intensity {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .patientList {
+        grid-template-columns: 1fr;
+    }
+
+    .historyItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+} 
