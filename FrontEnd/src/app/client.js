@@ -14,8 +14,8 @@ const Client = () => {
 
 
     // Initialize Vapi with API key
-    const API_KEY = "369dbb3f-c107-4ee1-8784-f960f951ef27";
-    const API_KEY_RESTENDPOINT = "82afeec7-dca6-47f0-b200-a513fd242b66";
+    const API_KEY = process.env.NEXT_PUBLIC_VAPI_SDK_KEY;
+    const API_KEY_RESTENDPOINT = process.env.NEXT_PUBLIC_VAPI_REST_KEY;
     const vapi = new Vapi(API_KEY);
 
  
@@ -81,8 +81,8 @@ const Client = () => {
 
     const handleVoiceCall = async () => {
         const callConfig = {
-            assistantId: "74cdbbbd-2bf6-4185-96f9-046e97db9518",
-            phoneNumberId: "101a1ffe-125c-4a17-9b8b-c160cc35bfa8",
+            assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID,
+            phoneNumberId: process.env.NEXT_PUBLIC_VAPI_PHONE_ID,
             customer: {
                 number: "+14039264437"
             },
