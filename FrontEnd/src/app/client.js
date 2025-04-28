@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { clientService } from '../services/api';
 import styles from './client.module.css';
+import Vapi from "@vapi-ai/web";
+
 
 const Client = () => {
     const [mood, setMood] = useState(null);
@@ -10,6 +12,13 @@ const Client = () => {
     const [error, setError] = useState(null);
     const [triggers, setTriggers] = useState([]);
 
+
+    // Initialize Vapi with API key
+    const API_KEY = "369dbb3f-c107-4ee1-8784-f960f951ef27";
+    const API_KEY_RESTENDPOINT = "82afeec7-dca6-47f0-b200-a513fd242b66";
+    const vapi = new Vapi(API_KEY);
+
+ 
     // Fetch triggers on component mount
     useEffect(() => {
         const fetchTriggers = async () => {
@@ -25,13 +34,7 @@ const Client = () => {
         fetchTriggers();
     }, []); // Empty dependency array means this runs once on mount
 
-    // Example triggers - in a real app, these would come from the patient's profile
-    const patientTriggers = [
-        "Seeing crowds",
-        "Loud noises",
-        "Meeting new people",
-        "Being alone"
-    ];
+    
 
     const handleMoodSelect = (selectedMood) => {
         setMood(selectedMood);
@@ -73,6 +76,42 @@ const Client = () => {
             alert('Failed to record entry. Please try again.');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleVoiceCall = async () => {
+        const callConfig = {
+            assistantId: "74cdbbbd-2bf6-4185-96f9-046e97db9518",
+            phoneNumberId: "101a1ffe-125c-4a17-9b8b-c160cc35bfa8",
+            customer: {
+                number: "+14039264437"
+            },
+            assistantOverrides: {
+                variableValues: {
+                    name: "Nitish",
+                    triggers: triggers.map(t => t.name)
+                }
+            }
+        };
+        
+        try {
+            const response = await fetch('https://api.vapi.ai/call', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY_RESTENDPOINT}`,  // Use API_KEY directly
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(callConfig)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to initiate call');
+            }
+
+            console.log('Call initiated successfully');
+        } catch (error) {
+            console.error('Voice call error:', error);
+            setError('Failed to start voice call');
         }
     };
 
@@ -148,6 +187,18 @@ const Client = () => {
             >
                 {isSubmitting ? 'Saving...' : 'Save Entry'}
             </button>
+
+            <div className={styles.voiceSection}>
+                <p className={styles.voiceDescription}>
+                    Want to talk instead? Use our Voice Agent to discuss your feelings and triggers.
+                </p>
+                <button 
+                    onClick={handleVoiceCall}
+                    className={`${styles.submitButton} ${styles.voiceButton}`}
+                >
+                    Call Patient
+                </button>
+            </div>
         </div>
     );
 };
