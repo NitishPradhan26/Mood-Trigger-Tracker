@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { clientService } from '../services/api';
 import styles from './psychiatrist.module.css';
+import { LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer } from 'recharts';
+import { format } from 'date-fns';
 
 const Psychiatrist = () => {
     const [patients, setPatients] = useState([]);
@@ -30,31 +32,34 @@ const Psychiatrist = () => {
 
     // Fetch both histories when a patient is selected
     useEffect(() => {
-        const fetchHistories = async () => {
+        const fetchData = async () => {
             if (!selectedPatient) return;
 
             try {
                 const fullName = `${selectedPatient.first_name} ${selectedPatient.last_name}`;
                 
-                // Make requests sequential instead of concurrent
-                const triggerHistory = await clientService.getTriggerHistory(fullName);
-                console.log('Received trigger history:', triggerHistory);
+                // Fetch regular histories
+                const [triggerHistory, moodHistory] = await Promise.all([
+                    clientService.getTriggerHistory(fullName),
+                    clientService.getMoodHistory(fullName)
+                ]);
                 
-                const moodHistory = await clientService.getMoodHistory(fullName);
-                console.log('Received mood history:', moodHistory);
-
+                // Fetch chart data
+                const chartData = await clientService.getChartData(fullName);
+                
                 setSelectedPatient(prev => ({
                     ...prev,
                     triggerHistory,
-                    moodHistory
+                    moodHistory,
+                    chartData
                 }));
             } catch (err) {
-                console.error('Error fetching histories:', err);
-                setError('Failed to load patient history');
+                console.error('Error fetching data:', err);
+                setError('Failed to load patient data');
             }
         };
 
-        fetchHistories();
+        fetchData();
     }, [selectedPatient?.client_id]);
 
     const getMoodEmoji = (mood) => {
@@ -139,6 +144,38 @@ const Psychiatrist = () => {
                                     </span>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Mood and Trigger Charts */}
+            {selectedPatient && (
+                <div className="grid grid-cols-1 gap-8 mb-8">
+                    <div className="p-4 bg-white rounded-lg shadow">
+                        <h3 className="text-lg font-semibold mb-4">Patient History</h3>
+                        <div className="h-[400px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={selectedPatient.moodHistory}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis 
+                                        dataKey="timestamp" 
+                                        tickFormatter={(timestamp) => format(new Date(timestamp), 'MM/dd HH:mm')}
+                                    />
+                                    <YAxis domain={[0, 10]} />
+                                    <Tooltip 
+                                        labelFormatter={(timestamp) => format(new Date(timestamp), 'MM/dd HH:mm')}
+                                    />
+                                    <Legend />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="value"
+                                        name="Mood"
+                                        stroke="#8884d8"
+                                        activeDot={{ r: 8 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,6 @@
 // Define base URL as a constant
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
-// Common headers
 const DEFAULT_HEADERS = {
     'Content-Type': 'application/json'
 };
@@ -21,6 +20,10 @@ export const clientService = {
     recordMood: async (clientId, mood) => {
         console.log('reached record mood before api call')
         try {
+            // Log the full URL and request data
+            console.log('Making request to:', `${API_BASE_URL}/mood`)
+            console.log('Request data:', { client_id: clientId, mood: mood })
+            
             const response = await fetch(`${API_BASE_URL}/mood`, {
                 method: 'POST',
                 headers: DEFAULT_HEADERS,
@@ -31,6 +34,8 @@ export const clientService = {
             });
 
             if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Server error:', errorData);
                 throw new APIError('Failed to record mood', response.status);
             }
 
@@ -125,6 +130,42 @@ export const clientService = {
             return await response.json();
         } catch (error) {
             console.error('Error fetching triggers:', error);
+            throw error;
+        }
+    },
+
+    // Record triggers batch
+    recordTriggersBatch: async (triggers) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/trigger-history/batch`, {
+                method: 'POST',
+                headers: DEFAULT_HEADERS,
+                body: JSON.stringify({ triggers })
+            });
+
+            if (!response.ok) {
+                throw new APIError('Failed to record triggers', response.status);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Trigger recording error:', error);
+            throw error;
+        }
+    },
+
+    // Get chart data for a client
+    getChartData: async (fullName) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/chart-data/${fullName}`);
+            
+            if (!response.ok) {
+                throw new APIError('Failed to fetch chart data', response.status);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
             throw error;
         }
     },
